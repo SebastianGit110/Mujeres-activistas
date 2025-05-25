@@ -1,0 +1,90 @@
+.loginContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  font-family: sans-serif;
+}
+
+.loginTitle {
+  color: #37785e;
+  margin-bottom: 10px;
+  font-size: 2.5rem;
+  text-align: center;
+}
+
+.loginSubtitle {
+  color: #757575;
+  margin-bottom: 30px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.authMethodSelector {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #555;
+}
+
+.radioLabel input {
+  margin-right: 8px;
+}
+
+.radioLabelActive {
+  color: #37785e;
+  font-weight: bold;
+}
+
+.loginForm {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.loginInput {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.loginInput:focus {
+  outline: none;
+  border-color: #37785e;
+  box-shadow: 0 0 5px rgba(55, 120, 94, 0.3);
+}
+
+.loginButton {
+  background-color: #37785e;
+  color: white;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background-color 0.3s ease;
+}
+
+.loginButton:hover {
+  background-color: #2a5d48;
+}
