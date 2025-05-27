@@ -21,6 +21,8 @@ app.use(express.urlencoded({ extended: false }));
 
 // Rutas
 app.use('/api/articles', require('./routers/articleRoutes'));
+app.use('/api/comments', require('./routers/commentRoutes'));
+
 
 // Para cuando implementes autenticación:
 // app.use('/api/users', require('./routes/userRoutes'));

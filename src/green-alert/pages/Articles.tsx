@@ -27,6 +27,8 @@ export const ArticlesSocialApp = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
   const [newArticle, setNewArticle] = useState({
     title: '',
     excerpt: '',
@@ -148,6 +150,51 @@ export const ArticlesSocialApp = () => {
     }
   };
 
+  // Funcion para obtener comentarios de un artículo
+  const fetchComments = async (articleId: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/comments/${articleId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setComments(data);
+      } else {
+        console.error('Error al obtener comentarios');
+      }
+    } catch (error) {
+      console.error('Error de conexión al obtener comentarios:', error);
+    }
+  };
+
+  const submitComment = async () => {
+  if (!newComment.trim()) return;
+
+  const response = await fetch(`${API_BASE_URL}/comments`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      articleId: selectedArticle._id,
+      author: 'Usuario Anónimo',
+      content: newComment,
+    }),
+  });
+
+  if (response.ok) {
+    const saved = await response.json();
+    setComments([saved, ...comments]);
+    setNewComment('');
+
+    // ✅ Incrementar el contador visualmente
+    setSelectedArticle(prev => ({
+      ...prev!,
+      commentCount: prev!.commentCount + 1
+    }));
+  } else {
+    alert('Error al publicar comentario');
+  }
+};
+
   useEffect(() => {
     fetchArticles();
   }, []);
@@ -155,8 +202,8 @@ export const ArticlesSocialApp = () => {
   // Filtrar artículos por búsqueda y categoría
   const filteredArticles = Array.isArray(articles) ? articles.filter(article => {
     const matchesSearch = article.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         article.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         article.author?.toLowerCase().includes(searchTerm.toLowerCase());
+      article.excerpt?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      article.author?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || article.category === selectedCategory;
     return matchesSearch && matchesCategory && article.status === 'published';
   }) : [];
@@ -164,6 +211,8 @@ export const ArticlesSocialApp = () => {
   const handleArticleClick = (article) => {
     setSelectedArticle(article);
     incrementViewCount(article.slug);
+    fetchComments(article._id);
+
   };
 
   const formatDate = (dateString) => {
@@ -182,13 +231,13 @@ export const ArticlesSocialApp = () => {
         <div className="max-w-4xl mx-auto p-4">
           {/* Header del artículo */}
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-            <button 
-              onClick={() => setSelectedArticle(null)}
+            <button
+              onClick={() => setSelectedArticle(null) || window.location.reload()}
               className="text-blue-500 hover:text-blue-700 mb-4 flex items-center gap-2"
             >
               Volver a la lista
             </button>
-            
+
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
                 <User className="w-6 h-6 text-purple-600" />
@@ -215,7 +264,7 @@ export const ArticlesSocialApp = () => {
             )}
 
             <h1 className="text-3xl font-bold text-gray-900 mb-4">{selectedArticle.title}</h1>
-            
+
             <div className="flex items-center gap-2 mb-6">
               <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">
                 {selectedArticle.category}
@@ -228,8 +277,8 @@ export const ArticlesSocialApp = () => {
             </div>
 
             {selectedArticle.imageUrl && selectedArticle.imageUrl !== '/placeholder.svg?height=200&width=300' && (
-              <img 
-                src={selectedArticle.imageUrl} 
+              <img
+                src={selectedArticle.imageUrl}
                 alt={selectedArticle.title}
                 className="w-full h-64 object-cover rounded-lg mb-6"
               />
@@ -251,17 +300,44 @@ export const ArticlesSocialApp = () => {
               <button className="flex items-center gap-2 text-gray-600 hover:text-blue-500 transition-colors">
                 <MessageCircle className="w-5 h-5" />
                 <span>Comentar ({selectedArticle.commentCount})</span>
-              </button>
-              <button className="flex items-center gap-2 text-gray-600 hover:text-green-500 transition-colors">
-                <Share2 className="w-5 h-5" />
-                <span>Compartir</span>
-              </button>
-              <button className="flex items-center gap-2 text-gray-600 hover:text-yellow-500 transition-colors">
-                <Bookmark className="w-5 h-5" />
-                <span>Guardar</span>
-              </button>
+              </button>            
             </div>
           </div>
+
+          {/* Comentarios */}
+          <div className="mt-8">
+            <h2 className="text-xl font-semibold mb-2">Comentarios</h2>
+
+            <div className="mb-4">
+              <textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Escribe tu comentario..."
+                className="w-full border border-gray-300 rounded p-2"
+              />
+              <button
+                onClick={submitComment}
+                className="mt-2 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+              >
+                Publicar
+              </button>
+            </div>
+
+            {comments.length === 0 ? (
+              <p className="text-gray-500">Aún no hay comentarios.</p>
+            ) : (
+              <ul className="space-y-4">
+                {comments.map((comment, i) => (
+                  <li key={i} className="bg-gray-100 p-3 rounded">
+                    <p className="text-sm text-gray-800">{comment.content}</p>
+                    <p className="text-xs text-gray-500 mt-1">— {comment.author}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <br></br>
         </div>
       </div>
     );
@@ -332,7 +408,7 @@ export const ArticlesSocialApp = () => {
                     <input
                       type="text"
                       value={newArticle.title}
-                      onChange={(e) => setNewArticle({...newArticle, title: e.target.value})}
+                      onChange={(e) => setNewArticle({ ...newArticle, title: e.target.value })}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       required
                     />
@@ -343,7 +419,7 @@ export const ArticlesSocialApp = () => {
                     <input
                       type="text"
                       value={newArticle.author}
-                      onChange={(e) => setNewArticle({...newArticle, author: e.target.value})}
+                      onChange={(e) => setNewArticle({ ...newArticle, author: e.target.value })}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       required
                     />
@@ -353,7 +429,7 @@ export const ArticlesSocialApp = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
                     <select
                       value={newArticle.category}
-                      onChange={(e) => setNewArticle({...newArticle, category: e.target.value})}
+                      onChange={(e) => setNewArticle({ ...newArticle, category: e.target.value })}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       required
                     >
@@ -367,7 +443,7 @@ export const ArticlesSocialApp = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Resumen</label>
                     <textarea
                       value={newArticle.excerpt}
-                      onChange={(e) => setNewArticle({...newArticle, excerpt: e.target.value})}
+                      onChange={(e) => setNewArticle({ ...newArticle, excerpt: e.target.value })}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       rows="3"
                       required
@@ -378,7 +454,7 @@ export const ArticlesSocialApp = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Contenido</label>
                     <textarea
                       value={newArticle.content}
-                      onChange={(e) => setNewArticle({...newArticle, content: e.target.value})}
+                      onChange={(e) => setNewArticle({ ...newArticle, content: e.target.value })}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       rows="8"
                       required
@@ -390,7 +466,7 @@ export const ArticlesSocialApp = () => {
                     <input
                       type="url"
                       value={newArticle.imageUrl}
-                      onChange={(e) => setNewArticle({...newArticle, imageUrl: e.target.value})}
+                      onChange={(e) => setNewArticle({ ...newArticle, imageUrl: e.target.value })}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
                   </div>
@@ -400,7 +476,7 @@ export const ArticlesSocialApp = () => {
                     <input
                       type="text"
                       value={newArticle.tags}
-                      onChange={(e) => setNewArticle({...newArticle, tags: e.target.value})}
+                      onChange={(e) => setNewArticle({ ...newArticle, tags: e.target.value })}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       placeholder="feminismo, activismo, derechos"
                     />
@@ -411,7 +487,7 @@ export const ArticlesSocialApp = () => {
                       type="checkbox"
                       id="featured"
                       checked={newArticle.isFeatured}
-                      onChange={(e) => setNewArticle({...newArticle, isFeatured: e.target.checked})}
+                      onChange={(e) => setNewArticle({ ...newArticle, isFeatured: e.target.checked })}
                       className="mr-2"
                     />
                     <label htmlFor="featured" className="text-sm font-medium text-gray-700">
@@ -460,9 +536,9 @@ export const ArticlesSocialApp = () => {
                     <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
                       <User className="w-6 h-6 text-purple-600" />
                     </div>
-                    
+
                     <div className="flex-1 min-w-0">
-                
+
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="font-semibold text-gray-900">{article.author}</h3>
                         <span className="text-gray-500">·</span>
@@ -479,14 +555,14 @@ export const ArticlesSocialApp = () => {
                       )}
 
                       {article.imageUrl && article.imageUrl !== '/placeholder.svg?height=200&width=300' && (
-                          <img 
-                            src={article.imageUrl} 
-                            alt={article.title}
-                            className="w-full h-64 object-cover rounded-lg mb-6"
-                          />
+                        <img
+                          src={article.imageUrl}
+                          alt={article.title}
+                          className="w-full h-64 object-cover rounded-lg mb-6"
+                        />
                       )}
-                      
-                      <h2 
+
+                      <h2
                         className="text-xl font-bold text-gray-900 mb-3 cursor-pointer hover:text-purple-600 transition-colors"
                         onClick={() => handleArticleClick(article)}
                       >
@@ -517,7 +593,7 @@ export const ArticlesSocialApp = () => {
                             {article.commentCount}
                           </span>
                         </div>
-                        
+
                         <button
                           onClick={() => handleArticleClick(article)}
                           className="text-purple-600 hover:text-purple-800 font-medium"
