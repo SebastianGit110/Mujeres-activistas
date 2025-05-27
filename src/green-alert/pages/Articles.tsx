@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Clock, User, Eye, MessageCircle, Plus, Search, Filter, Heart, Share2, Bookmark } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth'; // Ajusta si cambia la ruta
 
 interface Article {
   _id: string;
@@ -46,6 +47,7 @@ export const ArticlesSocialApp = () => {
     imageUrl: '',
     isFeatured: false
   });
+  const { email } = useAuth();
 
   const categories = ['Activism', 'Technology', 'Arts', 'Health', 'Economics', 'Leadership', 'Other'];
 
@@ -92,7 +94,7 @@ export const ArticlesSocialApp = () => {
 
   // Función para crear un nuevo artículo
   const createArticle = async () => {
-    if (!newArticle.title || !newArticle.excerpt || !newArticle.content || !newArticle.author) {
+    if (!newArticle.title || !newArticle.excerpt || !newArticle.content || !email) {
       alert('Por favor completa todos los campos obligatorios');
       return;
     }
@@ -100,6 +102,7 @@ export const ArticlesSocialApp = () => {
     try {
       const articleData = {
         ...newArticle,
+        author: email,
         slug: newArticle.title.toLowerCase()
           .replace(/[^a-z0-9 -]/g, '')
           .replace(/\s+/g, '-')
@@ -194,35 +197,35 @@ export const ArticlesSocialApp = () => {
   };
 
   // Función para enviar un nuevo comentario
-  const submitComment = async () => {
-    if (!newComment.trim()) return;
+ const submitComment = async () => {
+  if (!newComment.trim()) return;
 
-    const response = await fetch(`${API_BASE_URL}/comments`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        articleId: selectedArticle._id,
-        author: 'Usuario Anónimo',
-        content: newComment,
-      }),
-    });
+  const response = await fetch(`${API_BASE_URL}/comments`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      articleId: selectedArticle._id,
+      author: email || 'Usuario Anónimo',
+      content: newComment,
+    }),
+  });
 
-    if (response.ok) {
-      const saved = await response.json();
-      setComments([saved, ...comments]);
-      setNewComment('');
+  if (response.ok) {
+    const saved = await response.json();
+    setComments([saved, ...comments]);
+    setNewComment('');
 
-      // ✅ Incrementar el contador visualmente
-      setSelectedArticle(prev => ({
-        ...prev!,
-        commentCount: prev!.commentCount + 1
-      }));
-    } else {
-      alert('Error al publicar comentario');
-    }
-  };
+    setSelectedArticle(prev => ({
+      ...prev!,
+      commentCount: prev!.commentCount + 1,
+    }));
+  } else {
+    alert('Error al publicar comentario');
+  }
+};
+
 
   const submitCommentPreview = async ({
     articleId,
@@ -591,16 +594,7 @@ export const ArticlesSocialApp = () => {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Autor</label>
-                    <input
-                      type="text"
-                      value={newArticle.author}
-                      onChange={(e) => setNewArticle({ ...newArticle, author: e.target.value })}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
+                  
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
@@ -827,7 +821,7 @@ export const ArticlesSocialApp = () => {
                             submitCommentPreview({
                               articleId: article._id,
                               content: commentInput,
-                              author: commentAuthor || 'Usuario Anónimo',
+                              author: email || 'Usuario Anónimo',
                             })
                           }
                           className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition"
