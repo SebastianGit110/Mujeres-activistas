@@ -186,7 +186,7 @@ export const ArticlesSocialApp = () => {
               onClick={() => setSelectedArticle(null)}
               className="text-blue-500 hover:text-blue-700 mb-4 flex items-center gap-2"
             >
-              ← Volver a la lista
+              Volver a la lista
             </button>
             
             <div className="flex items-center gap-4 mb-6">
@@ -462,6 +462,7 @@ export const ArticlesSocialApp = () => {
                     </div>
                     
                     <div className="flex-1 min-w-0">
+                
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="font-semibold text-gray-900">{article.author}</h3>
                         <span className="text-gray-500">·</span>
@@ -477,6 +478,14 @@ export const ArticlesSocialApp = () => {
                         </div>
                       )}
 
+                      {article.imageUrl && article.imageUrl !== '/placeholder.svg?height=200&width=300' && (
+                          <img 
+                            src={article.imageUrl} 
+                            alt={article.title}
+                            className="w-full h-64 object-cover rounded-lg mb-6"
+                          />
+                      )}
+                      
                       <h2 
                         className="text-xl font-bold text-gray-900 mb-3 cursor-pointer hover:text-purple-600 transition-colors"
                         onClick={() => handleArticleClick(article)}
