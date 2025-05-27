@@ -344,6 +344,21 @@ export const ArticlesSocialApp = () => {
     }
   };
 
+  // Atajo de teclado para abrir el modal de creación de artículo
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl + K (Windows/Linux) o Cmd + K (Mac)
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault(); // Evita acciones por defecto del navegador
+        setShowCreateForm(true); // Abre el modal
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Cargar artículos al montar el componente
   useEffect(() => {
     fetchArticles();
   }, []);
@@ -513,10 +528,12 @@ export const ArticlesSocialApp = () => {
             <button
               onClick={() => setShowCreateForm(true)}
               className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+              title="Atajo: Ctrl + K"
             >
               <Plus className="w-5 h-5" />
-              Crear Artículo
+              Crear Artículo <span className="text-xs opacity-70">(Ctrl+K)</span>
             </button>
+
           </div>
 
           {/* Barra de búsqueda y filtros */}
