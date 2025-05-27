@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Clock, User, Eye, MessageCircle, Plus, Search, Filter, Heart, Share2, Bookmark } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth'; // Ajusta si cambia la ruta
 
+
 interface Article {
   _id: string;
   title: string;
@@ -47,7 +48,7 @@ export const ArticlesSocialApp = () => {
     imageUrl: '',
     isFeatured: false
   });
-  const { email } = useAuth();
+   const { name, email } = useAuth();
 
   const categories = ['Activism', 'Technology', 'Arts', 'Health', 'Economics', 'Leadership', 'Other'];
 
@@ -102,7 +103,7 @@ export const ArticlesSocialApp = () => {
     try {
       const articleData = {
         ...newArticle,
-        author: email,
+        author: name || email, //  usa el nombre si existe, si no usa el correo
         slug: newArticle.title.toLowerCase()
           .replace(/[^a-z0-9 -]/g, '')
           .replace(/\s+/g, '-')
@@ -207,7 +208,7 @@ export const ArticlesSocialApp = () => {
     },
     body: JSON.stringify({
       articleId: selectedArticle._id,
-      author: email || 'Usuario Anónimo',
+      author: name || email,
       content: newComment,
     }),
   });
@@ -821,7 +822,7 @@ export const ArticlesSocialApp = () => {
                             submitCommentPreview({
                               articleId: article._id,
                               content: commentInput,
-                              author: email || 'Usuario Anónimo',
+                              author: name ?? email ?? "Usuario Anónimo",
                             })
                           }
                           className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition"

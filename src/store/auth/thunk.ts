@@ -65,6 +65,7 @@ export const onRegisterUser = (formState: FormRegister) => {
             errorMessage: null
         }
         localStorage.setItem('userEmail', email ?? '');
+        localStorage.setItem('userName', name ?? '');
         dispatch(login(userData))
     }
 }
@@ -109,6 +110,7 @@ export const onLoginUser = (formState: FormLogin) => {
             errorMessage: null
         }
         localStorage.setItem('userEmail', email ?? '');
+        localStorage.setItem('userName', name ?? '');
         dispatch(login(userData))
     }
 }
