@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Article = require('../models/Article'); // ✅ Asegúrate de importar el modelo correcto
+const Article = require('../models/Article');
 
 const {
   getArticles,
@@ -40,5 +40,34 @@ router.patch('/:slug/view', async (req, res) => {
     res.status(500).json({ message: 'Error del servidor' });
   }
 });
+
+// Ruta para incrementar likes
+router.patch('/:slug/like', async (req, res) => {
+  const { action } = req.body; // "like" o "unlike"
+
+  if (!['like', 'unlike'].includes(action)) {
+    return res.status(400).json({ message: 'Acción inválida' });
+  }
+
+  try {
+    const increment = action === 'like' ? 1 : -1;
+
+    const article = await Article.findOneAndUpdate(
+      { slug: req.params.slug },
+      { $inc: { likeCount: increment } },
+      { new: true }
+    );
+
+    if (!article) {
+      return res.status(404).json({ message: 'Artículo no encontrado' });
+    }
+
+    res.json({ message: 'Like actualizado', likeCount: article.likeCount });
+  } catch (error) {
+    console.error('Error al actualizar like:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
 
 module.exports = router;

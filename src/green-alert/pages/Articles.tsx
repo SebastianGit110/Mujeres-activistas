@@ -29,6 +29,13 @@ export const ArticlesSocialApp = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
+  const [commentsPreview, setCommentsPreview] = useState<string | null>(null);
+  const [commentsData, setCommentsData] = useState<Comment[]>([]);
+  const [commentInput, setCommentInput] = useState('');
+  const [commentAuthor, setCommentAuthor] = useState('');
+
+  const [likedArticles, setLikedArticles] = useState<Set<string>>(new Set());
+  const [likeAnimation, setLikeAnimation] = useState(false);
   const [newArticle, setNewArticle] = useState({
     title: '',
     excerpt: '',
@@ -150,7 +157,7 @@ export const ArticlesSocialApp = () => {
     }
   };
 
-  // Funcion para obtener comentarios de un artículo
+  // Funcion para obtener comentarios de un artículo (preview)
   const fetchComments = async (articleId: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/comments/${articleId}`);
@@ -165,35 +172,177 @@ export const ArticlesSocialApp = () => {
     }
   };
 
+  const toggleCommentsPreview = async (articleId: string) => {
+    if (commentsPreview === articleId) {
+      setCommentsPreview(null);
+      setCommentsData([]);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/comments/${articleId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setCommentsData(data);
+        setCommentsPreview(articleId);
+      } else {
+        console.error('Error al obtener comentarios');
+      }
+    } catch (error) {
+      console.error('Error de conexión al obtener comentarios:', error);
+    }
+  };
+
+  // Función para enviar un nuevo comentario
   const submitComment = async () => {
-  if (!newComment.trim()) return;
+    if (!newComment.trim()) return;
 
-  const response = await fetch(`${API_BASE_URL}/comments`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      articleId: selectedArticle._id,
-      author: 'Usuario Anónimo',
-      content: newComment,
-    }),
-  });
+    const response = await fetch(`${API_BASE_URL}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        articleId: selectedArticle._id,
+        author: 'Usuario Anónimo',
+        content: newComment,
+      }),
+    });
 
-  if (response.ok) {
-    const saved = await response.json();
-    setComments([saved, ...comments]);
-    setNewComment('');
+    if (response.ok) {
+      const saved = await response.json();
+      setComments([saved, ...comments]);
+      setNewComment('');
 
-    // ✅ Incrementar el contador visualmente
-    setSelectedArticle(prev => ({
-      ...prev!,
-      commentCount: prev!.commentCount + 1
-    }));
-  } else {
-    alert('Error al publicar comentario');
-  }
-};
+      // ✅ Incrementar el contador visualmente
+      setSelectedArticle(prev => ({
+        ...prev!,
+        commentCount: prev!.commentCount + 1
+      }));
+    } else {
+      alert('Error al publicar comentario');
+    }
+  };
+
+  const submitCommentPreview = async ({
+    articleId,
+    content,
+    author,
+  }: {
+    articleId: string;
+    content: string;
+    author: string;
+  }) => {
+    if (!content.trim()) return;
+
+    const response = await fetch(`${API_BASE_URL}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        articleId,
+        author: author || 'Usuario Anónimo',
+        content,
+      }),
+    });
+
+    if (response.ok) {
+      const saved = await response.json();
+
+      setCommentsData(prev => [saved, ...prev]); // Para el preview
+      setCommentInput('');
+      setCommentAuthor('');
+
+      // ✅ Incrementa el contador en la lista principal
+      setArticles(prev =>
+        prev.map(article =>
+          article._id === articleId
+            ? { ...article, commentCount: article.commentCount + 1 }
+            : article
+        )
+      );
+    } else {
+      alert('Error al publicar comentario');
+    }
+  };
+
+
+  // Función para dar "me gusta" a un artículo
+  const likeArticle = async (slug: string) => {
+    // Evita duplicados
+    if (likedArticles.has(slug)) {
+      alert('Ya le diste me gusta a este artículo.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/articles/${slug}/like`, {
+        method: 'PATCH'
+      });
+      if (response.ok) {
+        const data = await response.json();
+
+        // Actualiza selectedArticle
+        setSelectedArticle(prev => ({
+          ...prev!,
+          likeCount: data.likeCount
+        }));
+
+        // Marca el artículo como "likeado"
+        setLikedArticles(prev => new Set(prev).add(slug));
+      } else {
+        console.warn('Error al dar me gusta');
+      }
+    } catch (error) {
+      console.error('Error de conexión al dar me gusta:', error);
+    }
+  };
+
+  // Función para alternar "me gusta" en un artículo
+  const toggleLikeArticle = async (slug: string, fromPreview: boolean = false) => {
+    const alreadyLiked = likedArticles.has(slug);
+    const action = alreadyLiked ? 'unlike' : 'like';
+
+    setLikeAnimation(true);
+    setTimeout(() => setLikeAnimation(false), 300);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/articles/${slug}/like`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        if (fromPreview) {
+          setArticles(prev =>
+            prev.map(article =>
+              article.slug === slug
+                ? { ...article, likeCount: data.likeCount }
+                : article
+            )
+          );
+        } else {
+          setSelectedArticle(prev => ({
+            ...prev!,
+            likeCount: data.likeCount,
+          }));
+        }
+
+        setLikedArticles(prev => {
+          const updated = new Set(prev);
+          if (alreadyLiked) updated.delete(slug);
+          else updated.add(slug);
+          return updated;
+        });
+      }
+    } catch (error) {
+      console.error('Error al actualizar me gusta:', error);
+    }
+  };
 
   useEffect(() => {
     fetchArticles();
@@ -293,14 +442,25 @@ export const ArticlesSocialApp = () => {
 
             {/* Acciones del artículo */}
             <div className="flex items-center gap-6 mt-8 pt-6 border-t">
-              <button className="flex items-center gap-2 text-gray-600 hover:text-red-500 transition-colors">
-                <Heart className="w-5 h-5" />
-                <span>Me gusta</span>
+              <button
+                onClick={() => toggleLikeArticle(selectedArticle.slug)}
+                className={`flex items-center gap-2 transition-colors ${likedArticles.has(selectedArticle.slug)
+                  ? 'text-red-500'
+                  : 'text-gray-600 hover:text-red-500'
+                  }`}
+              >
+                <Heart
+                  className={`w-5 h-5 transition-transform duration-300 ${likeAnimation ? 'scale-125' : ''
+                    }`}
+                  fill={likedArticles.has(selectedArticle.slug) ? 'currentColor' : 'none'} // 👈 esta línea rellena el corazón
+                />
+                <span>Me gusta ({selectedArticle.likeCount ?? 0})</span>
               </button>
+
               <button className="flex items-center gap-2 text-gray-600 hover:text-blue-500 transition-colors">
                 <MessageCircle className="w-5 h-5" />
-                <span>Comentar ({selectedArticle.commentCount})</span>
-              </button>            
+                <span>Comentarios ({selectedArticle.commentCount})</span>
+              </button>
             </div>
           </div>
 
@@ -584,13 +744,29 @@ export const ArticlesSocialApp = () => {
 
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-6 text-sm text-gray-500">
+                          <button
+                            onClick={() => toggleLikeArticle(article.slug, true)}
+                            className={`flex items-center gap-1 transition-colors ${likedArticles.has(article.slug)
+                              ? 'text-red-500'
+                              : 'text-gray-600 hover:text-red-500'
+                              }`}
+                          >
+                            <Heart
+                              className="w-4 h-4"
+                              fill={likedArticles.has(article.slug) ? 'currentColor' : 'none'}
+                            />
+                            {article.likeCount ?? 0}
+                          </button>
+                          <button
+                            onClick={() => toggleCommentsPreview(article._id)}
+                            className="flex items-center gap-1 hover:text-blue-600"
+                          >
+                            <MessageCircle className="w-4 h-4" />
+                            {article.commentCount}
+                          </button>
                           <span className="flex items-center gap-1">
                             <Eye className="w-4 h-4" />
                             {article.viewCount}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <MessageCircle className="w-4 h-4" />
-                            {article.commentCount}
                           </span>
                         </div>
 
@@ -603,6 +779,49 @@ export const ArticlesSocialApp = () => {
                       </div>
                     </div>
                   </div>
+                  {commentsPreview === article._id && (
+                    <div className="mt-4 bg-gray-100 p-4 rounded space-y-4">
+                      <h4 className="font-semibold text-sm text-gray-700">Comentarios:</h4>
+
+                      {commentsData.length === 0 ? (
+                        <p className="text-gray-500 text-sm">No hay comentarios.</p>
+                      ) : (
+                        <ul className="space-y-2 text-sm">
+                          {commentsData.slice(0, 3).map((comment, i) => (
+                            <li key={i} className="border-b border-gray-300 pb-2">
+                              <p className="text-gray-800">{comment.content}</p>
+                              <p className="text-gray-500 text-xs">— {comment.author}</p>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      {/* Formulario de nuevo comentario */}
+                      <div className="space-y-2">
+                        <textarea
+                          rows={2}
+                          placeholder="Escribe un comentario..."
+                          value={commentInput}
+                          onChange={(e) => setCommentInput(e.target.value)}
+                          className="w-full p-2 border border-gray-300 rounded"
+                        ></textarea>
+                        <button
+                          onClick={() =>
+                            submitCommentPreview({
+                              articleId: article._id,
+                              content: commentInput,
+                              author: commentAuthor || 'Usuario Anónimo',
+                            })
+                          }
+                          className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition"
+                        >
+                          Enviar Comentario
+                        </button>
+
+                      </div>
+                    </div>
+                  )}
+
                 </div>
               </div>
             ))

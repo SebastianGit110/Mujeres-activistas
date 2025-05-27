@@ -56,6 +56,8 @@ const articleSchema = mongoose.Schema(
       enum: ['draft', 'published'],
       default: 'published',
     },
+    likeCount: { type: Number, default: 0 }
+
   },
   {
     timestamps: true,
