@@ -57,6 +57,10 @@ export const Navbar = () => {
             </li>
 
             <li>
+              <Link to="/articles">Articulos</Link>
+            </li>
+            
+            <li>
               <Link to="/graphics">Estadísticas</Link>
             </li>
 
