@@ -19,34 +19,21 @@ export const HomePage = () => {
     <Container>
       <section className="pt-12">
         <article className="text-center flex flex-col items-center h-auto p-20">
-          <h1 className="text-[#37785e] borderfont-sans text-[90px]">
+          <h1 className="text-white font-extrabold text-[90px] drop-shadow-[4px_4px_0_black]">
             MujeresPorElCambio
           </h1>
 
-          <h3 className="w-[870px] text-center text-gray-800">
-            Accede a nuestra plataforma dedicada a visibilizar
-            el trabajo de mujeres activistas en todo el territorio. Desde
-            nuestro sitio, podrás explorar de manera clara y significativa los
-            perfiles, historias y contribuciones de mujeres que lideran procesos
-            sociales, ambientales, culturales y políticos. Nuestra herramienta
-            te permite navegar por un mapa interactivo, descubrir oportunidades
-            de mentoría y conectarte con iniciativas en tu región. Con un
-            compromiso firme con la equidad, la memoria y la participación, te
-            invitamos a conocer, apoyar y difundir las voces de las mujeres que
-            transforman realidades.
+          <h3 className="w-[970px] text-center text-black bg-white/30 backdrop-blur-md rounded-xl p-10 shadow-lg">
+            Accede a nuestra plataforma dedicada a visibilizar el trabajo de mujeres activistas en todo el territorio.
+            Desde nuestro sitio, podrás explorar de manera clara y significativa los perfiles, historias y contribuciones
+            de mujeres que lideran procesos sociales, ambientales, culturales y políticos. Nuestra herramienta te permite
+            navegar por un mapa interactivo, descubrir oportunidades de mentoría y conectarte con iniciativas en tu región.
+            Con un compromiso firme con la equidad, la memoria y la participación, te invitamos a conocer, apoyar y difundir
+            las voces de las mujeres que transforman realidades.
           </h3>
-
-          {/* <Button
-            className="mt-20"
-            style={{ fontFamily: "Arial" }}
-            variant="shadow"
-            color="success"
-            onClick={navigateToMap}
-          >
-            Empieza ahora
-          </Button> */}
         </article>
       </section>
+
     </Container>
   );
 };

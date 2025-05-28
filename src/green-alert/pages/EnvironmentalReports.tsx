@@ -231,7 +231,7 @@ export default function EnvironmentalReports() {
   return (
     <div className="p-6 max-w-3xl mx-auto bg-gray-50 min-h-screen">
       <h1 className="text-4xl font-extrabold text-gray-800 mb-8 text-center leading-tight">
-        Reportes Ambientales <span className="text-green-600">Comunitarios</span>
+        Reportes Ambientales <span className="text-purple-500">Comunitarios</span>
       </h1>
 
       <div className="bg-white p-6 rounded-xl shadow-lg mb-8 border border-gray-200">
@@ -242,14 +242,14 @@ export default function EnvironmentalReports() {
             placeholder="Título breve y claro del reporte"
             value={title}
             onChange={e => setTitle(e.target.value)}
-            className="border border-gray-300 rounded-lg p-3 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+            className="border border-gray-300 rounded-lg p-3 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
             required
           />
           <textarea
             placeholder="Describe detalladamente el acontecimiento ambiental..."
             value={description}
             onChange={e => setDescription(e.target.value)}
-            className="border border-gray-300 rounded-lg p-3 h-32 resize-y focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+            className="border border-gray-300 rounded-lg p-3 h-32 resize-y focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
             required
           />
           <select
@@ -264,7 +264,7 @@ export default function EnvironmentalReports() {
           </select>
           <button
             type="submit"
-            className="bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition-all duration-300 shadow-md hover:shadow-lg"
+            className="bg-purple-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 transition-all duration-300 shadow-md hover:shadow-lg"
           >
             <span className="flex items-center justify-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -330,7 +330,7 @@ export default function EnvironmentalReports() {
               ) : (
                 // Lógica condicional para mostrar el corazón relleno o vacío
                 userVotes.has(report.id) ? (
-                  <FaHeart className="text-green-600 h-5 w-5 transition-transform transform hover:scale-110" />
+                  <FaHeart className="text-purple-600 h-5 w-5 transition-transform transform hover:scale-110" />
                 ) : (
                   <FaRegHeart className="text-gray-400 h-5 w-5 transition-transform transform hover:scale-110" />
                 )

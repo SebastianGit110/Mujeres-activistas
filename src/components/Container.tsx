@@ -1,4 +1,4 @@
-import backgroundImage from '../assets/backgroundMujeres.jpeg'
+import backgroundImage from '../assets/backgroundMujeres.png'
 
 interface ContainerProps {
     children: React.ReactNode

@@ -41,7 +41,7 @@ const getArticles = async (req, res) => {
     
     // Ejecutar la consulta paginada
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 6;
+    const limit = parseInt(req.query.limit) || 40;
     const skip = (page - 1) * limit;
     
     const articles = await Article.find(query)

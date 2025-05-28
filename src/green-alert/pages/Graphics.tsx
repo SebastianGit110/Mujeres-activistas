@@ -238,8 +238,10 @@ export const Graphics = () => {
         margin: "0 auto",
       }}
     >
-      <h1 style={{ textAlign: "center", color: "#333", marginBottom: "20px" }}>
-        Acciones de Mujeres Activistas
+      <h1 className="text-4xl font-extrabold text-gray-800 mb-8 text-center leading-tight" style={{ textAlign: "center", color: "purple-500", marginBottom: "20px" }}>
+        <span className="text-purple-500">   
+          Acciones de Mujeres Activistas
+        </span>
       </h1>
 
       <div
