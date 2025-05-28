@@ -51,6 +51,7 @@ export const Navbar = () => {
       <section className="text-xl">
         <nav>
           <ul className="flex gap-6 items-center">
+
             <li>
               <Link to="/map">Mapa</Link>
             </li>
@@ -61,6 +62,9 @@ export const Navbar = () => {
 
             <li>
               <Link to="/graphics">Estadísticas</Link>
+            </li>
+            <li>
+              <Link to="/reports">Reporta</Link>
             </li>
 
             {status === "authenticated" ? (

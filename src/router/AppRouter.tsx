@@ -4,6 +4,8 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AuthRouter } from '../auth/router'
 import { AdminRouter } from '../admin/router'
 import { HomePage } from '../pages'
+import  EnvironmentalReports  from '../green-alert/pages/EnvironmentalReports'
+
 
 import { Loading, Navbar } from '../components'
 import { MapPage } from '../green-alert/pages'
@@ -59,12 +61,15 @@ export const AppRouter = () => {
                             { uid == ADMIN_KEY && <Route index path='/admin/*' element={<AdminRouter />} />}
                             
                             <Route path='/map' element={<MapPage />} />
+                            
+                            <Route path='/reports' element={<EnvironmentalReports />} />
                             <Route path='/graphics' element={<Graphics />} />
                             <Route path='/articles' element={<ArticlesSocialApp />} />
                             <Route path='/perfil' element={<ProfilePage />} />
                             <Route path='/' element={<HomePage />} />
 
                             <Route path='/*' element={<Navigate to='/map' />} />
+                            
                         </>
                     )
                 }
