@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from '../hooks'
 import { onGetUser } from '../store/auth'
 import { Graphics } from '../green-alert/pages/Graphics'
 import { ArticlesSocialApp } from '../green-alert/pages/Articles'
-
+import { ProfilePage } from '../pages/ProfilePage';
 const ADMIN_KEY = import.meta.env.VITE_ADMIN_KEY
 
 export const AppRouter = () => {
@@ -61,6 +61,7 @@ export const AppRouter = () => {
                             <Route path='/map' element={<MapPage />} />
                             <Route path='/graphics' element={<Graphics />} />
                             <Route path='/articles' element={<ArticlesSocialApp />} />
+                            <Route path='/perfil' element={<ProfilePage />} />
                             <Route path='/' element={<HomePage />} />
 
                             <Route path='/*' element={<Navigate to='/map' />} />

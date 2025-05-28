@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { animate } from "animejs";
 
 export const Navbar = () => {
-  const { status } = useAppSelector((state) => state.auth);
+  const { status, user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -18,22 +18,21 @@ export const Navbar = () => {
   const text = "MujeresPorElCambio";
 
   useEffect(() => {
-    animate('h1 span', {
+    animate("h1 span", {
       y: [
-        { to: '-1rem', ease: 'outExpo', duration: 600 },
-        { to: 0, ease: 'outBounce', duration: 800, delay: 100 }
+        { to: "-1rem", ease: "outExpo", duration: 600 },
+        { to: 0, ease: "outBounce", duration: 800, delay: 100 },
       ],
       rotate: {
-        from: '-1turn',
-        delay: 0
+        from: "-1turn",
+        delay: 0,
       },
       delay: (_, i) => i * 50,
-      ease: 'inOutCirc',
+      ease: "inOutCirc",
       loopDelay: 1000,
-      loop: true
+      loop: true,
     });
   }, []);
-
 
   return (
     <div className="bg-white flex p-6 px-16 items-center">
@@ -59,24 +58,31 @@ export const Navbar = () => {
             <li>
               <Link to="/articles">Articulos</Link>
             </li>
-            
+
             <li>
               <Link to="/graphics">Estadísticas</Link>
             </li>
 
             {status === "authenticated" ? (
-              <li>
-                <Button onClick={handleOnClick} color="danger">
-                  Cerrar sesion
-                </Button>
-              </li>
+              <>
+                <li>
+                  <Link to="/perfil" className="text-purple-600 font-medium hover:underline">
+                    {user.name || user.email}
+                  </Link>
+                </li>
+                <li>
+                  <Button onClick={handleOnClick} color="danger">
+                    Cerrar sesión
+                  </Button>
+                </li>
+              </>
             ) : (
               <>
                 <li>
-                  <Link to="/auth/login">Inicia sesion</Link>
+                  <Link to="/auth/login">Inicia sesión</Link>
                 </li>
                 <li>
-                  <Link to="/auth/register">Registrate</Link>
+                  <Link to="/auth/register">Regístrate</Link>
                 </li>
               </>
             )}
