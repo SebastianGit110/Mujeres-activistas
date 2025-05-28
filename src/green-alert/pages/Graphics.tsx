@@ -1,40 +1,82 @@
 import { useEffect, useRef } from "react";
 import * as echarts from "echarts";
+import { useAppSelector } from "../../hooks";
+
+// Datos de eventos de mujeres activistas (simulados)
+const months = [
+  "Ene",
+  "Feb",
+  "Mar",
+  "Abr",
+  "May",
+  "Jun",
+  "Jul",
+  "Ago",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dic",
+];
+const regions = [
+  "Centroamérica",
+  "Sudamérica",
+  "Caribe",
+  "Norteamérica",
+  "Europa",
+];
 
 export const Graphics = () => {
+  // Grafico 1
+  const incidentsLoaded = useAppSelector((state) => state.incidents.markers);
+  const dates = incidentsLoaded?.map((elem) => elem.when) || [];
+
+  const monthCounts = dates.reduce((acc: any, month: string) => {
+    acc[month] = (acc[month] || 0) + 1;
+    return acc;
+  }, {});
+
+  const resultByMonth = months.map((month) => monthCounts[month] || 0);
+
+  // Grafico 2
+  const incidents =
+    useAppSelector((state) => state.incidents.listIncidentsType) || [];
+
+  const ids = incidentsLoaded?.map((elem) => elem.incident_type) || [];
+
+  const counts = ids.reduce((acc: any, id: any) => {
+    acc[id] = (acc[id] || 0) + 1;
+    return acc;
+  }, {});
+
+  const dataGraph2 = incidents
+    .filter((incident) => counts[incident.id])
+    .map((incident) => ({
+      value: counts[incident.id],
+      name: incident.name,
+    }));
+
+  // Grafico 3
+
+  const whereRegiones = incidentsLoaded?.map((elem) => elem.where) || [];
+
+  const countsRegions = whereRegiones.reduce((acc: any, region: any) => {
+    acc[region] = (acc[region] || 0) + 1;
+    return acc;
+  }, {});
+
+  // Ahora construimos el array en el orden de `regions`
+  const result = regions.map((region) => countsRegions[region] || 0);
+
   const timelineRef = useRef(null);
   const categoriesRef = useRef(null);
   const regionsRef = useRef(null);
 
   useEffect(() => {
-    // Datos de eventos de mujeres activistas (simulados)
-    const months = [
-      "Ene",
-      "Feb",
-      "Mar",
-      "Abr",
-      "May",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dic",
-    ];
-    const regions = [
-      "Centroamérica",
-      "Sudamérica",
-      "Caribe",
-      "Norteamérica",
-      "Europa",
-    ];
-
     // Gráfico 1: Eventos por mes
     const timelineChart = echarts.init(timelineRef.current);
     const timelineOption = {
       title: {
-        text: "Eventos de mujeres activistas por mes (2023)",
+        text: "Eventos de mujeres activistas",
         left: "center",
       },
       tooltip: {
@@ -55,7 +97,7 @@ export const Graphics = () => {
         {
           name: "Eventos",
           type: "bar",
-          data: [45, 58, 76, 93, 120, 145, 132, 118, 105, 98, 112, 127],
+          data: resultByMonth,
           itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
               { offset: 0, color: "#ff7e5f" },
@@ -93,13 +135,7 @@ export const Graphics = () => {
           name: "Eventos",
           type: "pie",
           radius: "50%",
-          data: [
-            { value: 320, name: "Protestas" },
-            { value: 240, name: "Talleres" },
-            { value: 180, name: "Arte" },
-            { value: 275, name: "Denuncias" },
-            { value: 210, name: "Cuidado" },
-          ],
+          data: dataGraph2,
           itemStyle: {
             borderRadius: 5,
             borderColor: "#fff",
@@ -148,7 +184,7 @@ export const Graphics = () => {
         {
           name: "Eventos",
           type: "bar",
-          data: [320, 290, 150, 180, 210],
+          data: result,
           itemStyle: {
             color: function (params: any) {
               const colorList = [

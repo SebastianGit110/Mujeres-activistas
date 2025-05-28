@@ -1,6 +1,7 @@
-import MarkerFire from '../assets/icons/fire.svg'
-import Rain from '../assets/icons/rain.svg'
-import LandSlide from '../assets/icons/landslide.svg'
+import Manifestacion from '../assets/icons/mmegafono.png'
+import Ambiente from '../assets/icons/ambiente.png'
+import Cultura from '../assets/icons/cultura.png'
+import Talleres from '../assets/icons/formacion.png'
 import defaultIcon from '../assets/icons/InitMarker.svg'
 
 import forestFireImg from '../assets/infowindow/forest_fire.svg'
@@ -16,11 +17,13 @@ export const handleIncidentImage = (type: number) => {
 }
 
 export const handleIncidentText = (type: number) => {
-    if (type == 1) return "Incendio"
+    if (type == 1) return "Manifestación"
 
-    if (type == 2) return "Deslizamiento de tierras"
+    if (type == 2) return "Ambiente"
 
-    if (type == 3) return "Fuertes lluvias"
+    if (type == 3) return "Cultura"
+
+    if (type == 4) return "Talleres"
 }
 
 export const handleIncidentColor = (type: number) => {
@@ -32,11 +35,13 @@ export const handleIncidentColor = (type: number) => {
 }
 
 export const handleIncidentIcon = (type: number) => {
-    if (type == 1) return MarkerFire
+    if (type == 1) return Manifestacion
 
-    if (type == 2) return LandSlide
+    if (type == 2) return Ambiente
 
-    if (type == 3) return Rain
+    if (type == 3) return Cultura
+
+    if (type == 4) return Talleres
 
     return defaultIcon
 }

@@ -21,7 +21,9 @@ const initialState: initialStateProp = {
             lat: 0,
             lng: 0,
         },
-        images: []
+        images: [],
+        where: "",
+        when: ""
     },
     listIncidentsType: [],
     isLoading: false

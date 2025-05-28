@@ -10,6 +10,8 @@ interface MarkerType {
     }
     images: string[]
     create_by?: string
+    where: string
+    when: string
 }
 
 interface FormIncident {
